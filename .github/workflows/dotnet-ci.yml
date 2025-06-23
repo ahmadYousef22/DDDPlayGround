@@ -1,10 +1,15 @@
-name: .NET CI
+name: .NET CI/CD
 
 on:
   push:
-    branches: [ main ]
+    branches: [ "master" ]
   pull_request:
-    branches: [ main ]
+    branches: [ "master" ]
+
+env:
+  ASPNETCORE_ENVIRONMENT: Production
+  ExternalApiUrl: ${{ secrets.EXTERNAL_API_URL }}
+  MySecretKey: ${{ secrets.MY_SECRET_KEY }}
 
 jobs:
   build:
@@ -23,7 +28,15 @@ jobs:
       run: dotnet restore
 
     - name: Build
-      run: dotnet build --no-restore --configuration Release
+      run: dotnet build --configuration Release --no-restore
 
-    - name: Run tests
-      run: dotnet test --no-build --verbosity normal
+    - name: Test
+      run: dotnet test --no-restore --verbosity normal
+
+    - name: Publish
+      run: dotnet publish --configuration Release --output ./publish
+
+    # Example deployment step (optional, depending where you host)
+    # - name: Deploy to Render / Azure / FTP / etc.
+    #   run: echo "Add deployment commands here"
+    
