@@ -1,18 +1,30 @@
-﻿# Use official .NET 8 SDK image for build
+﻿# Use official .NET SDK image for build
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+
 WORKDIR /app
 
-# Copy sln and csproj files, restore dependencies
-COPY *.sln .
+# Copy solution file
+COPY *.sln ./
+
+# Copy all project files
 COPY DDDPlayGround.*/*.csproj ./
-RUN dotnet restore
 
-# Copy everything else and publish
+# Restore using solution
+RUN dotnet restore DDDPlayGround.sln
+
+# Copy the full source
 COPY . ./
-RUN dotnet publish DDDPlayGround.Host/DDDPlayGround.Host.csproj -c Release -o /out
 
-# Build runtime image
-FROM mcr.microsoft.com/dotnet/aspnet:8.0
+# Build
+RUN dotnet build DDDPlayGround.sln --configuration Release --no-restore
+
+# Publish
+RUN dotnet publish DDDPlayGround.sln --configuration Release --output /app/publish --no-restore
+
+# Use runtime image
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+
 WORKDIR /app
-COPY --from=build /out .
+COPY --from=build /app/publish ./
+
 ENTRYPOINT ["dotnet", "DDDPlayGround.Host.dll"]
