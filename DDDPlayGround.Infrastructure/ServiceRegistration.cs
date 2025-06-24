@@ -5,10 +5,12 @@ using DDDPlayGround.Application.Services;
 using DDDPlayGround.Domain.Entities.Authentication;
 using DDDPlayGround.Domain.Interfaces;
 using DDDPlayGround.Infrastructure.Integration;
+using DDDPlayGround.Infrastructure.Middleware;
 using DDDPlayGround.Infrastructure.Persistence.Context;
 using DDDPlayGround.Infrastructure.Repositories;
 using DDDPlayGround.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -85,6 +87,10 @@ namespace DDDPlayGround.Infrastructure
             });
 
             return services;
+        }
+        public static IApplicationBuilder UseCustomExceptionMiddleware(this IApplicationBuilder app)
+        {
+            return app.UseMiddleware<ExceptionMiddleware>();
         }
     }
 }

@@ -1,6 +1,5 @@
 using DDDPlayGround.Host;
 using DDDPlayGround.Infrastructure;
-using DDDPlayGround.Infrastructure.Middleware;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -38,13 +37,13 @@ app.UseSwaggerUI(c =>
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "DDDPlayGround API V1");
 });
 
-app.UseMiddleware<ExceptionMiddleware>();
-
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
 
 app.UseAuthorization();
+
+app.UseCustomExceptionMiddleware();
 
 app.MapControllers();
 

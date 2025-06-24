@@ -1,5 +1,6 @@
 ﻿using DDDPlayGround.Domain.Entities.Authentication;
 using DDDPlayGround.Domain.Entities.Common;
+using DDDPlayGround.Infrastructure.Persistence.Interceptors;
 using DDDPlayGround.Shared.Constants;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,6 +17,13 @@ namespace DDDPlayGround.Infrastructure.Persistence.Context
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(DatabaseContext).Assembly);
             modelBuilder.HasDefaultSchema(SchemaName.DDD);
             base.OnModelCreating(modelBuilder);
+        }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            base.OnConfiguring(optionsBuilder);
+
+            optionsBuilder.AddInterceptors(new HandleAuditInterceptor());
         }
 
         public DbSet<User> Users => Set<User>();
