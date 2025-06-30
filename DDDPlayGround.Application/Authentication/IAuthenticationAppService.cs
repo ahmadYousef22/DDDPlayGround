@@ -1,5 +1,5 @@
 ﻿using DDDPlayGround.Application.Authentication.Dtos;
-using DDDPlayGround.Shared.Base;
+using DDDPlayGround.Domain.Base;
 
 namespace DDDPlayGround.Application.Authentication
 {

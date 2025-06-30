@@ -1,6 +1,6 @@
-﻿using DDDPlayGround.Shared.Enums;
+﻿using DDDPlayGround.Domain.Enums;
 
-namespace DDDPlayGround.Shared.Base
+namespace DDDPlayGround.Domain.Base
 {
     public class Response<T>
     {

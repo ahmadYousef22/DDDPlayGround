@@ -23,7 +23,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DDDPlayGround.Application\DDDPlayGround.Application.csproj" />
     <ProjectReference Include="..\DDDPlayGround.Infrastructure\DDDPlayGround.Infrastructure.csproj" />
   </ItemGroup>
 

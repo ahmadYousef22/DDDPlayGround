@@ -1,5 +1,4 @@
-﻿
-namespace DDDPlayGround.Shared.Base
+﻿namespace DDDPlayGround.Domain.Base
 {
     public abstract class AuditableEntity : Entity
     {

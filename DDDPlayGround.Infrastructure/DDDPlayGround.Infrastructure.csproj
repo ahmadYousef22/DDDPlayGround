@@ -4,6 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <UserSecretsId>70c27cf5-4bbf-4953-9d1e-77c959188fe3</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,8 +20,11 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
+    <PackageReference Include="Serilog.Enrichers.Environment" Version="3.0.1" />
+    <PackageReference Include="Serilog.Enrichers.Thread" Version="4.0.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
     <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
+    <PackageReference Include="Serilog.Sinks.MSSqlServer" Version="8.2.0" />
     <PackageReference Include="System.ServiceModel.Duplex" Version="6.0.*" />
     <PackageReference Include="System.ServiceModel.Federation" Version="6.0.*" />
     <PackageReference Include="System.ServiceModel.Http" Version="6.0.*" />
@@ -31,10 +35,10 @@
   <ItemGroup>
     <ProjectReference Include="..\DDDPlayGround.Application\DDDPlayGround.Application.csproj" />
     <ProjectReference Include="..\DDDPlayGround.Domain\DDDPlayGround.Domain.csproj" />
-    <ProjectReference Include="..\DDDPlayGround.Shared\DDDPlayGround.Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Persistence\Mappings\Common\" />
     <Folder Include="Persistence\Scripts\" />
   </ItemGroup>
 

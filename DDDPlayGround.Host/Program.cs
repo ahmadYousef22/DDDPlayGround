@@ -16,8 +16,8 @@ builder.Services.AddJwtAuthentication(builder.Configuration);
 
 builder.Services.AddDependancyInjection();
 
-builder.Host.AddLoggingService();
-
+builder.Host.AddLoggingService(builder.Configuration);
+  
 builder.Services.AddMapperService();
 
 builder.Services.AddCorsService();
@@ -26,7 +26,11 @@ builder.Services.AddRateLimiting(builder.Configuration);
 
 builder.Services.AddHttpClient();
 
+builder.Services.AddHttpAccessor();
+
 var app = builder.Build();
+
+app.UseCustomSerilogRequestLogging();
 
 app.UseSwagger();
 
@@ -44,6 +48,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseCustomExceptionMiddleware();
+
+app.UseRequestLogging();
 
 app.MapControllers();
 

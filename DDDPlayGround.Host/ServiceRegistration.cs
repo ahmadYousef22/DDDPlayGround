@@ -9,7 +9,6 @@ namespace DDDPlayGround.Host
         {
             services.AddOptions();
             services.AddMemoryCache();
-
             services.Configure<IpRateLimitOptions>(configuration.GetSection("IpRateLimiting"));
             services.AddSingleton<IIpPolicyStore, MemoryCacheIpPolicyStore>();
             services.AddSingleton<IRateLimitCounterStore, MemoryCacheRateLimitCounterStore>();

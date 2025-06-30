@@ -1,4 +1,4 @@
-﻿namespace DDDPlayGround.Shared.Enums
+﻿namespace DDDPlayGround.Domain.Enums
 {
     public enum HttpStatusCode
     {

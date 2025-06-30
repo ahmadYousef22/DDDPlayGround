@@ -1,11 +1,9 @@
-﻿using DDDPlayGround.Application.Authentication;
-using DDDPlayGround.Application.Authentication.JwtToken;
+﻿using DDDPlayGround.Application.Authentication.JwtToken;
 using DDDPlayGround.Application.Integration;
-using DDDPlayGround.Application.Services;
-using DDDPlayGround.Domain.Entities.Authentication;
 using DDDPlayGround.Domain.Interfaces;
-using DDDPlayGround.Infrastructure.Integration;
-using DDDPlayGround.Infrastructure.Middleware;
+using DDDPlayGround.Infrastructure.Integration.Rest;
+using DDDPlayGround.Infrastructure.Integration.Soap;
+using DDDPlayGround.Infrastructure.Middlewares;
 using DDDPlayGround.Infrastructure.Persistence.Context;
 using DDDPlayGround.Infrastructure.Repositories;
 using DDDPlayGround.Infrastructure.Services;
@@ -18,6 +16,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
+using Serilog.Sinks.MSSqlServer;
 using System.Text;
 
 namespace DDDPlayGround.Infrastructure
@@ -32,28 +31,37 @@ namespace DDDPlayGround.Infrastructure
         public static IServiceCollection AddDependancyInjection(this IServiceCollection services)
         {
             services.AddScoped<IUserRepository, UserRepository>();
-            services.AddScoped<IUserTokenRepository, UserTokenRepository>();
-            services.AddScoped(typeof(ILoggingService<>), typeof(LoggingService<>));
             services.AddScoped<IUnitOfWork, UnitOfWork>();
-            services.AddScoped<ILogRepository, LogRepository>();
             services.AddScoped<IJwtTokenService, JwtTokenService>();
-            services.AddScoped<IAuthenticationAppService, AuthenticationAppService>();
+            //services.AddScoped<IAuthenticationAppService, AuthenticationAppService>();
             services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
             services.AddScoped<IRestIntegrationService, RestIntegrationService>();
             services.AddScoped<INumberConversionService, NumberConversionService>();
-
+            services.AddScoped(typeof(IRepository<,>), typeof(Repository<,>));
+ 
 
             return services;
         }
-        public static IHostBuilder AddLoggingService(this IHostBuilder builder)
+        public static IHostBuilder AddLoggingService(this IHostBuilder builder, IConfiguration configuration)
         {
             Log.Logger = new LoggerConfiguration()
-                .WriteTo.Console()
-                .WriteTo.File("Logs/log-.txt", rollingInterval: RollingInterval.Day)
                 .Enrich.FromLogContext()
+                .Enrich.WithProperty("ApplicationName", "DDDPlayGround")
+                .Enrich.WithEnvironmentName()
+                .Enrich.WithEnvironmentUserName()
+                .Enrich.WithMachineName()
+                .Enrich.WithThreadId()
+                .Enrich.WithThreadName()
                 .MinimumLevel.Debug()
+                .WriteTo.Console()
+                .WriteTo.MSSqlServer(
+                   connectionString: configuration.GetConnectionString("LoggingDb"),
+                   sinkOptions: new MSSqlServerSinkOptions
+                   {
+                       TableName = "Logs",
+                       AutoCreateSqlTable = true
+                   })
                 .CreateLogger();
-
             builder.UseSerilog();
             return builder;
         }        
@@ -74,6 +82,8 @@ namespace DDDPlayGround.Infrastructure
             })
             .AddJwtBearer(options =>
             {
+                options.RequireHttpsMetadata = true;
+                options.SaveToken = true; // Optional: allows access to token in controller
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = true,
@@ -82,15 +92,42 @@ namespace DDDPlayGround.Infrastructure
                     ValidAudience = jwtSettings["Audience"],
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret)),
-                    ValidateLifetime = true
+                    ValidateLifetime = true,
+                    ClockSkew = TimeSpan.Zero // no delay in expiration
                 };
             });
 
             return services;
         }
-        public static IApplicationBuilder UseCustomExceptionMiddleware(this IApplicationBuilder app)
+
+        public static IApplicationBuilder UseCustomExceptionMiddleware(this IApplicationBuilder application)
         {
-            return app.UseMiddleware<ExceptionMiddleware>();
+            return application.UseMiddleware<ExceptionMiddleware>();
+        }
+        public static IServiceCollection AddHttpAccessor(this IServiceCollection services)
+        {
+            services.AddHttpContextAccessor(); 
+            return services;
+        }
+        public static IApplicationBuilder UseRequestLogging(this IApplicationBuilder app)
+        {
+            return app.UseMiddleware<RequestLoggingMiddleware>();
+        }
+        public static IApplicationBuilder UseCustomSerilogRequestLogging(this IApplicationBuilder app)
+        {
+            return app.UseSerilogRequestLogging(options =>
+            {
+                options.EnrichDiagnosticContext = (diagnosticContext, httpContext) =>
+                {
+                    var userName = httpContext.User?.Identity?.Name ?? "Anonymous";
+                    var correlationId = httpContext.Request.Headers["X-Correlation-ID"].ToString();
+
+                    diagnosticContext.Set("UserName", userName);
+                    diagnosticContext.Set("RequestHost", httpContext.Request.Host.Value);
+                    diagnosticContext.Set("RequestScheme", httpContext.Request.Scheme);
+                    diagnosticContext.Set("CorrelationId", correlationId);
+                };
+            });
         }
     }
 }

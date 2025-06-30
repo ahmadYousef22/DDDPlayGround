@@ -1,5 +1,5 @@
-﻿using DDDPlayGround.Domain.Entities.Authentication;
-using DDDPlayGround.Shared.Constants;
+﻿using DDDPlayGround.Domain.Constants;
+using DDDPlayGround.Domain.Entities.Authentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -25,6 +25,17 @@ namespace DDDPlayGround.Infrastructure.Persistence.Mappings.Authentication
                 e.Property(p => p.Value)
                  .HasColumnName("Email")
                  .HasMaxLength(150);
+            });
+
+            builder.OwnsOne(u => u.FullName, e =>
+            {
+                e.Property(p=>p.FirstName)
+                .HasColumnName("FirstName")
+                .HasMaxLength (100); 
+                
+                e.Property(p=>p.LastName)
+                .HasColumnName("LastName")
+                .HasMaxLength (100);
             });
 
             builder.OwnsOne(u => u.PasswordHash, p =>

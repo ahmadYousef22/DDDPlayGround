@@ -1,4 +1,4 @@
-﻿using DDDPlayGround.Shared.Base;
+﻿using DDDPlayGround.Domain.Base;
 
 namespace DDDPlayGround.Application.Integration
 {

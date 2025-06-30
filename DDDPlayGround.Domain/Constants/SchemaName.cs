@@ -1,8 +1,8 @@
-﻿namespace DDDPlayGround.Shared.Constants
+﻿namespace DDDPlayGround.Domain.Constants
 {
     public static class SchemaName
     {
-        public const string DDD = "DDD"; 
+        public const string DDD = "DDD";
         public const string Domain = "Domain";
         public const string Lookup = "Lookup";
         public const string Log = "Log";

@@ -1,10 +1,10 @@
 ﻿using DDDPlayGround.Application.Integration;
-using DDDPlayGround.Shared.Base;
-using DDDPlayGround.Shared.Enums;
+using DDDPlayGround.Domain.Base;
+using DDDPlayGround.Domain.Enums;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace DDDPlayGround.Infrastructure.Integration
+namespace DDDPlayGround.Infrastructure.Integration.Rest
 {
     public class RestIntegrationService : IRestIntegrationService
     {

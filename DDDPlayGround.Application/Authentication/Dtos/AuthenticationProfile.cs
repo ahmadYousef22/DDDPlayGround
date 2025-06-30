@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using DDDPlayGround.Domain.Entities.Authentication;
 
 namespace DDDPlayGround.Application.Authentication.Dtos
 {
