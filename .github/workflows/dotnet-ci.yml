@@ -1,4 +1,4 @@
-name: .NET CI/CD
+name: .NET CI/CD with Docker and Render
 
 on:
   push:
@@ -19,24 +19,36 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Setup .NET
+    - name: Setup .NET SDK
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: '8.0.x'
 
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore DDDPlayGround.sln
 
     - name: Build
-      run: dotnet build --configuration Release --no-restore
+      run: dotnet build DDDPlayGround.sln --configuration Release --no-restore
 
     - name: Test
       run: dotnet test --no-restore --verbosity normal
 
     - name: Publish
-      run: dotnet publish --configuration Release --output ./publish
+  run: dotnet publish DDDPlayGround.Host/DDDPlayGround.Host.csproj --configuration Release --output ./publish --no-build
 
-    # Example deployment step (optional, depending where you host)
-    # - name: Deploy to Render / Azure / FTP / etc.
-    #   run: echo "Add deployment commands here"
-    
+    - name: Build Docker image
+      run: docker build -t yourdockerhubusername/dddplayground:latest .
+
+    # Optional: Push docker image (uncomment and add secrets if you want)
+    #- name: Login to DockerHub
+    #  uses: docker/login-action@v2
+    #  with:
+    #    username: ${{ secrets.DOCKER_USERNAME }}
+    #    password: ${{ secrets.DOCKER_PASSWORD }}
+
+    #- name: Push Docker image
+    #  run: docker push yourdockerhubusername/dddplayground:latest
+
+    - name: Deploy to Render
+      run: |
+        echo "Add your Render deployment commands here"
