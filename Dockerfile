@@ -13,7 +13,7 @@ RUN dotnet restore DDDPlayGround.sln
 RUN dotnet build DDDPlayGround.sln --configuration Release --no-restore
 
 # Publish only the Host project (adjust project name if needed)
-RUN dotnet publish src/DDDPlayGround.Host/DDDPlayGround.Host.csproj -c Release -o /app/publish --no-build
+RUN dotnet publish src/DDDPlayGround.Host -c Release -o /app/publish --no-build
 
 # Stage 2: Runtime
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
