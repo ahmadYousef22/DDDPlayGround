@@ -18,11 +18,10 @@ namespace DDDPlayGround.Host.Controllers
             _numberConversionService = numberConversionService;
         }
 
-        [HttpGet]
-        [Authorize]
+        [HttpGet("[action]")]
         public async Task<IActionResult> GetAdvice()
         {
-            var response = await _restIntegrationService.GetExternalDataAsync("AdviceEndpoint");
+            var response = await _restIntegrationService.GetAsync("AdviceEndpoint");
 
             if (!response.Success)
                 return StatusCode((int)response.StatusCode, response);
@@ -30,16 +29,14 @@ namespace DDDPlayGround.Host.Controllers
             return Ok(response);
         }
 
-        [HttpGet]
-        [Authorize]
+        [HttpGet("[action]")]
         public async Task<IActionResult> GetWords(int number)
         {
             var result = await _numberConversionService.ConvertNumberToWordsAsync(number);
             return Ok(result);
         }
 
-        [HttpGet]
-        [Authorize]
+        [HttpGet("[action]")]
         public async Task<IActionResult> GetDollars(int number)
         {
             var result = await _numberConversionService.ConvertNumberToDollarsAsync(number);

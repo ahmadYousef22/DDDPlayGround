@@ -1,5 +1,5 @@
 ﻿using DDDPlayGround.Application.Authentication.Dtos;
-using DDDPlayGround.Shared.Base;
+using DDDPlayGround.Domain.Base;
 
 namespace DDDPlayGround.Application.Authentication
 {
@@ -9,5 +9,6 @@ namespace DDDPlayGround.Application.Authentication
         Task<Response<LoginResponseDto>> LoginAsync(LoginRequestDto request);
         Task<Response<LoginResponseDto>> RefreshTokenAsync(string refreshToken);    
         Task LogoutAsync(string refreshToken);
+        Task LogoutAllSessionsAsync(Guid userId);
     }
 }

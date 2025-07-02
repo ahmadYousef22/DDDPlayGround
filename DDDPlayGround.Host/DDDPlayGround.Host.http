@@ -1,6 +1,1 @@
 @DDDPlayGround.Host_HostAddress = http://localhost:5232
-
-GET {{DDDPlayGround.Host_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###

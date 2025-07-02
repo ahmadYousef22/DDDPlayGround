@@ -6,8 +6,4 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\DDDPlayGround.Shared\DDDPlayGround.Shared.csproj" />
-  </ItemGroup>
-
 </Project>

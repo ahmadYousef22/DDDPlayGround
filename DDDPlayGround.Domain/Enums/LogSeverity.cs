@@ -1,5 +1,4 @@
-﻿
-namespace DDDPlayGround.Shared.Enums
+﻿namespace DDDPlayGround.Domain.Enums
 {
     public enum LogSeverity
     {
@@ -7,5 +6,6 @@ namespace DDDPlayGround.Shared.Enums
         Warning,
         Error,
         Debug,
+        Audit
     }
 }

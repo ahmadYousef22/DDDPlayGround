@@ -1,5 +1,4 @@
-﻿
-namespace DDDPlayGround.Shared.Constants
+﻿namespace DDDPlayGround.Domain.Constants
 {
     public static class RegularExpression
     {

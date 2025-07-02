@@ -11,7 +11,14 @@ namespace DDDPlayGround.Application.Authentication.Validator
                .NotEmpty().WithMessage("Username is required.");
 
             RuleFor(x => x.Password)
-                .NotEmpty().WithMessage("Password is required.");
+                .NotEmpty().WithMessage("Password is required.")
+                .Must(content => !ContainsScripts(content));
+        }
+
+        private bool ContainsScripts(string input)
+        {
+            return input.Contains("<script>", StringComparison.OrdinalIgnoreCase)
+                || input.Contains("javascript:", StringComparison.OrdinalIgnoreCase);
         }
     }
 }

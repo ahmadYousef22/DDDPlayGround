@@ -1,4 +1,4 @@
-﻿using DDDPlayGround.Shared.Base;
+﻿using DDDPlayGround.Domain.Base;
 
 namespace DDDPlayGround.Domain.Entities.Authentication
 {
@@ -16,9 +16,14 @@ namespace DDDPlayGround.Domain.Entities.Authentication
         public virtual User User { get; private set; } = default!;
 
         private UserToken() { }
-
         public UserToken(Guid userId, string token, DateTime expires, string? createdByIp)
         {
+            if (string.IsNullOrWhiteSpace(token))
+                throw new ArgumentNullException(nameof(token));
+
+            if (expires <= DateTime.UtcNow)
+                throw new ArgumentException("Token expiry must be in the future", nameof(expires));
+
             UserId = userId;
             Token = token;
             Expires = expires;
@@ -28,6 +33,8 @@ namespace DDDPlayGround.Domain.Entities.Authentication
 
         public void Revoke(string? revokedByIp, string? replacedByToken)
         {
+            if (IsRevoked) return;
+
             IsRevoked = true;
             RevokedAt = DateTime.UtcNow;
             RevokedByIp = revokedByIp;
@@ -35,5 +42,6 @@ namespace DDDPlayGround.Domain.Entities.Authentication
         }
 
         public bool IsExpired => DateTime.UtcNow >= Expires;
+        public bool IsActive => !IsRevoked && !IsExpired;
     }
 }

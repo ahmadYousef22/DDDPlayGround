@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Logging;
 using NumberConversionServiceReference;
 
-namespace DDDPlayGround.Infrastructure.Integration
+namespace DDDPlayGround.Infrastructure.Integration.Soap
 {
     public class NumberConversionService : INumberConversionService
     {

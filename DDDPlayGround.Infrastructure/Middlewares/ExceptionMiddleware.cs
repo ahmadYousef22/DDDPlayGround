@@ -1,10 +1,10 @@
-﻿using DDDPlayGround.Shared.Base;
-using DDDPlayGround.Shared.Enums;
+﻿using DDDPlayGround.Domain.Base;
+using DDDPlayGround.Domain.Enums;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
 
-namespace DDDPlayGround.Infrastructure.Middleware
+namespace DDDPlayGround.Infrastructure.Middlewares
 {
     public class ExceptionMiddleware
     {
@@ -27,11 +27,11 @@ namespace DDDPlayGround.Infrastructure.Middleware
             {
                 _logger.LogError(ex, "Unhandled exception occurred");
 
-                context.Response.StatusCode = (int)HttpStatusCode.InternalError;
+                context.Response.StatusCode = (int)HttpStatusCodes.InternalError;
                 context.Response.ContentType = "application/json";
 
                 var response = Response<string>.Failure(
-                    HttpStatusCode.InternalError,
+                    HttpStatusCodes.InternalError,
                     "An unexpected error occurred. Please contact support.");
 
                 var json = JsonSerializer.Serialize(response);

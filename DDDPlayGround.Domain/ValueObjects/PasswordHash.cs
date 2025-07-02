@@ -3,7 +3,7 @@
     public record PasswordHash
     {
         public string Value { get; }
-
+        private PasswordHash() { }
         public PasswordHash(string value)
         {
             if (string.IsNullOrWhiteSpace(value))
