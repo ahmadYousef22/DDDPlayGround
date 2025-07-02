@@ -34,7 +34,7 @@ jobs:
       run: dotnet test --no-restore --verbosity normal
 
     - name: Publish
-      run: dotnet publish src/DDDPlayGround.Host --configuration Release --output ./publish --no-build
+  run: dotnet publish DDDPlayGround.Host/DDDPlayGround.Host.csproj --configuration Release --output ./publish --no-build
 
     - name: Build Docker image
       run: docker build -t yourdockerhubusername/dddplayground:latest .
