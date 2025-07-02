@@ -76,7 +76,7 @@ app.UseSwaggerUI(c =>
 
 app.UseHttpsRedirection();
 
-//if (builder.Environment.IsProduction()) { app.UseHsts(); } // this allow only https request 
+if (builder.Environment.IsProduction()) { app.UseHsts(); } // this allow only https request 
 
 app.UseAuthentication();
 

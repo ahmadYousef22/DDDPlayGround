@@ -38,7 +38,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Persistence\Mappings\Common\" />
     <Folder Include="Persistence\Scripts\" />
   </ItemGroup>
 

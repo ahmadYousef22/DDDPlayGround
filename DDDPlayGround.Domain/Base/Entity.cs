@@ -7,7 +7,8 @@
     public abstract class Entity<TPrimaryKey>
     {
         public TPrimaryKey? Id { get; protected set; }
-
+        public bool IsDeleted { get; protected set; }
+        public bool IsActive { get; protected set; }
         public override bool Equals(object? obj)
         {
             if (obj is not Entity<TPrimaryKey> other)
