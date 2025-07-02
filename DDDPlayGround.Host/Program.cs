@@ -1,6 +1,7 @@
 using DDDPlayGround.Host;
 using DDDPlayGround.Infrastructure;
 using DDDPlayGround.Infrastructure.Configuration;
+using System.Text.Encodings.Web;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,7 +11,7 @@ builder.Services.AddConnectionString(builder.Configuration);
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
      {
-         options.JsonSerializerOptions.Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping; 
+         options.JsonSerializerOptions.Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping; 
      });
 
 builder.Services.AddEndpointsApiExplorer();
@@ -75,7 +76,7 @@ app.UseSwaggerUI(c =>
 
 app.UseHttpsRedirection();
 
-if (builder.Environment.IsProduction()) { app.UseHsts(); } // this allow only https request 
+//if (builder.Environment.IsProduction()) { app.UseHsts(); } // this allow only https request 
 
 app.UseAuthentication();
 
