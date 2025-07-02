@@ -16,11 +16,13 @@ namespace DDDPlayGround.Domain.Entities.Authentication
         public virtual User User { get; private set; } = default!;
 
         private UserToken() { }
-
         public UserToken(Guid userId, string token, DateTime expires, string? createdByIp)
         {
-            if (string.IsNullOrWhiteSpace(token)) throw new ArgumentNullException(nameof(token));
-            if (expires <= DateTime.UtcNow) throw new ArgumentException("Token expiry must be in the future", nameof(expires));
+            if (string.IsNullOrWhiteSpace(token))
+                throw new ArgumentNullException(nameof(token));
+
+            if (expires <= DateTime.UtcNow)
+                throw new ArgumentException("Token expiry must be in the future", nameof(expires));
 
             UserId = userId;
             Token = token;
@@ -31,6 +33,8 @@ namespace DDDPlayGround.Domain.Entities.Authentication
 
         public void Revoke(string? revokedByIp, string? replacedByToken)
         {
+            if (IsRevoked) return;
+
             IsRevoked = true;
             RevokedAt = DateTime.UtcNow;
             RevokedByIp = revokedByIp;

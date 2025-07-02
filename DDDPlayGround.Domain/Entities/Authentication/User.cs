@@ -41,6 +41,11 @@ public class User : AuditableEntity, IAggregateRoot
         LastPasswordChanged = DateTime.UtcNow;
     }
 
+    public void SetPassword(string hashedPassword)
+    {
+        PasswordHash = new PasswordHash(hashedPassword);
+    }
+
     public void SetPasswordResetToken(string token, DateTime expiry)
     {
         PasswordResetToken = token;
@@ -55,6 +60,8 @@ public class User : AuditableEntity, IAggregateRoot
 
     public void AddToken(UserToken token)
     {
+        if (_tokens.Any(t => t.Token == token.Token && !t.IsRevoked))
+            throw new InvalidOperationException("Duplicate active token");
         _tokens.Add(token);
     }
 

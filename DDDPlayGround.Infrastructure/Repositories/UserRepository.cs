@@ -1,5 +1,4 @@
-﻿using DDDPlayGround.Domain.Entities.Authentication;
-using DDDPlayGround.Domain.Interfaces;
+﻿using DDDPlayGround.Domain.Interfaces;
 using DDDPlayGround.Infrastructure.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,7 +8,7 @@ namespace DDDPlayGround.Infrastructure.Repositories
     {
         private readonly DatabaseContext _dbContext;
 
-        public UserRepository(DatabaseContext dbContext) : base(dbContext) { }
+        public UserRepository(DatabaseContext dbContext) : base(dbContext) { _dbContext = dbContext; }
 
         public async Task<User?> GetByUsername(string username)
         {

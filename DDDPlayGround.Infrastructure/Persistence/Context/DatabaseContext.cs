@@ -1,4 +1,5 @@
 ﻿using DDDPlayGround.Domain.Constants;
+using DDDPlayGround.Domain.Entities.Authentication;
 using DDDPlayGround.Infrastructure.Interceptors;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,6 +22,7 @@ namespace DDDPlayGround.Infrastructure.Persistence.Context
             optionsBuilder.AddInterceptors(new HandleAuditInterceptor());
         }
 
-        public DbSet<User> Users => Set<User>();
+        public DbSet<User> Users { get; set; }
+        public DbSet<UserToken> UserTokens { get; set; }
     }
 }

@@ -1,4 +1,5 @@
-﻿using DDDPlayGround.Application.Authentication.JwtToken;
+﻿using DDDPlayGround.Application.Authentication;
+using DDDPlayGround.Application.Authentication.JwtToken;
 using DDDPlayGround.Application.Integration;
 using DDDPlayGround.Domain.Interfaces;
 using DDDPlayGround.Infrastructure.Integration.Rest;
@@ -7,6 +8,8 @@ using DDDPlayGround.Infrastructure.Middlewares;
 using DDDPlayGround.Infrastructure.Persistence.Context;
 using DDDPlayGround.Infrastructure.Repositories;
 using DDDPlayGround.Infrastructure.Services;
+using FluentValidation.AspNetCore;
+using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
@@ -25,7 +28,10 @@ namespace DDDPlayGround.Infrastructure
     {
         public static IServiceCollection AddConnectionString(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(configuration.GetConnectionString("ConnectionString")));
+            services.AddDbContext<DatabaseContext>(options =>
+            {
+                options.UseSqlServer(configuration.GetConnectionString("ConnectionString"));
+            });
             return services;
         }
         public static IServiceCollection AddDependancyInjection(this IServiceCollection services)
@@ -33,10 +39,11 @@ namespace DDDPlayGround.Infrastructure
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IJwtTokenService, JwtTokenService>();
-            //services.AddScoped<IAuthenticationAppService, AuthenticationAppService>();
+            services.AddScoped<IAuthenticationAppService, AuthenticationAppService>();
             services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
             services.AddScoped<IRestIntegrationService, RestIntegrationService>();
             services.AddScoped<INumberConversionService, NumberConversionService>();
+            services.AddScoped<IUserTokenRepository, UserTokenRepository>();
             services.AddScoped(typeof(IRepository<,>), typeof(Repository<,>));
  
 
@@ -44,27 +51,30 @@ namespace DDDPlayGround.Infrastructure
         }
         public static IHostBuilder AddLoggingService(this IHostBuilder builder, IConfiguration configuration)
         {
-            Log.Logger = new LoggerConfiguration()
+            var loggingConnectionString = configuration.GetConnectionString("LoggingDb");
+
+            var loggerConfig = new LoggerConfiguration()
                 .Enrich.FromLogContext()
                 .Enrich.WithProperty("ApplicationName", "DDDPlayGround")
-                .Enrich.WithEnvironmentName()
-                .Enrich.WithEnvironmentUserName()
-                .Enrich.WithMachineName()
-                .Enrich.WithThreadId()
-                .Enrich.WithThreadName()
                 .MinimumLevel.Debug()
-                .WriteTo.Console()
-                .WriteTo.MSSqlServer(
-                   connectionString: configuration.GetConnectionString("LoggingDb"),
-                   sinkOptions: new MSSqlServerSinkOptions
-                   {
-                       TableName = "Logs",
-                       AutoCreateSqlTable = true
-                   })
-                .CreateLogger();
+                .WriteTo.Console();
+
+            if (!string.IsNullOrWhiteSpace(loggingConnectionString))
+            {
+                loggerConfig = loggerConfig.WriteTo.MSSqlServer(
+                    connectionString: loggingConnectionString,
+                    sinkOptions: new MSSqlServerSinkOptions
+                    {
+                        TableName = "Logs",
+                        AutoCreateSqlTable = true
+                    });
+            }
+
+            Log.Logger = loggerConfig.CreateLogger();
             builder.UseSerilog();
+
             return builder;
-        }        
+        }
         public static IServiceCollection AddMapperService(this IServiceCollection builder)
         {
             builder.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
@@ -74,6 +84,7 @@ namespace DDDPlayGround.Infrastructure
         {
             var jwtSettings = configuration.GetSection("JwtSettings");
             var secret = jwtSettings["Secret"] ?? throw new ArgumentNullException("JwtSettings:Secret");
+
 
             services.AddAuthentication(options =>
             {
@@ -99,7 +110,6 @@ namespace DDDPlayGround.Infrastructure
 
             return services;
         }
-
         public static IApplicationBuilder UseCustomExceptionMiddleware(this IApplicationBuilder application)
         {
             return application.UseMiddleware<ExceptionMiddleware>();
@@ -128,6 +138,18 @@ namespace DDDPlayGround.Infrastructure
                     diagnosticContext.Set("CorrelationId", correlationId);
                 };
             });
+        }
+        public static IServiceCollection AddFluentValidationServices(this IServiceCollection services)
+        {
+            services.AddFluentValidationAutoValidation();
+            services.AddFluentValidationClientsideAdapters();
+
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies()
+                                .Where(a => !a.IsDynamic && !string.IsNullOrWhiteSpace(a.Location))
+                                .ToArray();
+
+            services.AddValidatorsFromAssemblies(assemblies, includeInternalTypes: true);
+            return services;
         }
     }
 }

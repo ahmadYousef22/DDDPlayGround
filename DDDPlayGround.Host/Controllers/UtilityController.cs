@@ -6,7 +6,7 @@ namespace DDDPlayGround.Host.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize]
+    [Authorize]
     public class UtilityController : ControllerBase
     {
         private readonly IRestIntegrationService _restIntegrationService;
@@ -19,10 +19,9 @@ namespace DDDPlayGround.Host.Controllers
         }
 
         [HttpGet("[action]")]
-        //[Authorize]
         public async Task<IActionResult> GetAdvice()
         {
-            var response = await _restIntegrationService.GetExternalDataAsync("AdviceEndpoint");
+            var response = await _restIntegrationService.GetAsync("AdviceEndpoint");
 
             if (!response.Success)
                 return StatusCode((int)response.StatusCode, response);
@@ -31,7 +30,6 @@ namespace DDDPlayGround.Host.Controllers
         }
 
         [HttpGet("[action]")]
-        //[Authorize]
         public async Task<IActionResult> GetWords(int number)
         {
             var result = await _numberConversionService.ConvertNumberToWordsAsync(number);
@@ -39,7 +37,6 @@ namespace DDDPlayGround.Host.Controllers
         }
 
         [HttpGet("[action]")]
-        //[Authorize]
         public async Task<IActionResult> GetDollars(int number)
         {
             var result = await _numberConversionService.ConvertNumberToDollarsAsync(number);

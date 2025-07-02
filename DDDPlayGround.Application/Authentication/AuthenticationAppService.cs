@@ -1,147 +1,200 @@
 ﻿using AutoMapper;
+using DDDPlayGround.Application.Authentication.Dtos;
 using DDDPlayGround.Application.Authentication.JwtToken;
+using DDDPlayGround.Domain.Base;
+using DDDPlayGround.Domain.Entities.Authentication;
+using DDDPlayGround.Domain.Enums;
 using DDDPlayGround.Domain.Interfaces;
+using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
+using System.Security.Cryptography;
 
 namespace DDDPlayGround.Application.Authentication
 {
-    public class AuthenticationAppService /*: IAuthenticationAppService*/
+    public class AuthenticationAppService : IAuthenticationAppService
     {
         private readonly ILogger<AuthenticationAppService> _logger;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IUserRepository _userRepository;
+        private readonly IUserTokenRepository _userTokenRepository;
         private readonly IPasswordHasher<User> _passwordHasher;
         private readonly IJwtTokenService _jwtService;
         private readonly IMapper _mapper;
+        private readonly IValidator<LoginRequestDto> _loginValidator;
+        private readonly IValidator<RegisterRequestDto> _registerValidator;
 
         public AuthenticationAppService(
             IUnitOfWork unitOfWork,
             ILogger<AuthenticationAppService> logger,
             IUserRepository userRepository,
+            IUserTokenRepository userTokenRepository,
             IPasswordHasher<User> passwordHasher,
             IJwtTokenService jwtService,
-            IMapper mapper
-            )
+            IMapper mapper,
+            IValidator<RegisterRequestDto> registerValidator,
+            IValidator<LoginRequestDto> loginValidator)
         {
             _jwtService = jwtService;
             _userRepository = userRepository;
+            _userTokenRepository = userTokenRepository;
             _passwordHasher = passwordHasher;
             _unitOfWork = unitOfWork;
             _logger = logger;
             _mapper = mapper;
+            _loginValidator = loginValidator;
+            _registerValidator = registerValidator;
         }
 
-        //public async Task<Response<string>> RegisterAsync(RegisterRequestDto request)
-        //{
-        //    try
-        //    {
-        //        if (await _userRepository.ExistsAsync(request.Username))
-        //        {
-        //            return Response<string>.Failure(HttpStatusCode.BadRequest, "Username already exists");
-        //        }
+        public async Task<Response<LoginResponseDto>> LoginAsync(LoginRequestDto request)
+        {
+            try
+            {
+                var validationResult = await _loginValidator.ValidateAsync(request);
+                if (!validationResult.IsValid)
+                {
+                    var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
+                    return Response<LoginResponseDto>.Failure(HttpStatusCodes.BadRequest, "Validation failed", errors);
+                }
 
-        //        var user = _mapper.Map<User>(request);
-        //        user.SetRole(UserRole.User);
+                var user = await _userRepository.GetByUsername(request.Username);
+                if (user == null)
+                {
+                    _logger.LogWarning("Login failed: User not found for username {Username}", request.Username);
+                    return Response<LoginResponseDto>.Failure(HttpStatusCodes.BadRequest, "Invalid username or password");
+                }
 
-        //        var hashedPassword = _passwordHasher.HashPassword(user, request.Password);
-        //        user.SetPassword(new PasswordHash(hashedPassword));
+                var passwordVerification = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash.Value, request.Password);
+                if (passwordVerification == PasswordVerificationResult.Failed)
+                {
+                    _logger.LogWarning("Login failed: Invalid password for username {Username}", request.Username);
+                    return Response<LoginResponseDto>.Failure(HttpStatusCodes.BadRequest, "Invalid username or password");
+                }
 
-        //        await _userRepository.AddAsync(user);
-        //        return Response<string>.SuccessResult(string.Empty, "User registered successfully");
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogError("Error in Register", ex);
-        //        return Response<string>.Failure(HttpStatusCode.InternalError, "An unexpected error occurred");
-        //    }
-        //}
-        //public async Task<Response<LoginResponseDto>> LoginAsync(LoginRequestDto request)
-        //{
-        //    try
-        //    {
-        //        var user = await _userRepository.GetByUsernameAsync(request.Username);
-        //        if (user == null || !user.IsActive)
-        //        {
-        //            return Response<LoginResponseDto>.Failure(HttpStatusCode.NotAuthenticated, "Invalid credentials");
-        //        }
+                var token = _jwtService.GenerateToken(user);
 
-        //        var verifyResult = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash.Value, request.Password);
-        //        if (verifyResult == PasswordVerificationResult.Failed)
-        //        {
-        //            return Response<LoginResponseDto>.Failure(HttpStatusCode.NotAuthenticated, "Invalid credentials");
-        //        }
+                var refreshTokenValue = GenerateSecureToken();
+                var refreshToken = new UserToken(user.Id, refreshTokenValue, DateTime.UtcNow.AddDays(7), null); 
 
-        //        var token = _jwtService.GenerateToken(user);
+                await _userTokenRepository.AddAsync(refreshToken);
+                await _unitOfWork.SaveChangesAsync();
 
-        //        var loginResponse = _mapper.Map<LoginResponseDto>(user);
-        //        loginResponse.Token = token;
+                var loginResponse = new LoginResponseDto
+                {
+                    Token = token,
+                    Username = user.Username,
+                    Role = user.Role.ToString()
+                };
 
-        //        return Response<LoginResponseDto>.SuccessResult(loginResponse, "Login successful");
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogError("Error in Login", ex);
-        //        return Response<LoginResponseDto>.Failure(HttpStatusCode.InternalError, "An unexpected error occurred");
-        //    }
-        //}
-        //public async Task LogoutAsync(string refreshToken)
-        //{
-        //    var userToken = await _userTokenRepository.GetByTokenAsync(refreshToken);
+                return Response<LoginResponseDto>.SuccessResult(loginResponse);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred during login for username {Username}", request.Username);
+                return Response<LoginResponseDto>.Failure(HttpStatusCodes.InternalError, "An unexpected error occurred");
+            }
+        }
 
-        //    if (userToken == null || userToken.IsRevoked || userToken.IsExpired)
-        //    {
-        //        return;
-        //    }
+        public async Task<Response<string>> RegisterAsync(RegisterRequestDto request)
+        {
+            try
+            {
+                var validationResult = await _registerValidator.ValidateAsync(request);
+                if (!validationResult.IsValid)
+                {
+                    var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
+                    return Response<string>.Failure(HttpStatusCodes.BadRequest, "Validation failed", errors);
+                }
 
-        //    userToken.Revoke(revokedByIp: null, replacedByToken: null);
-        //    await _userTokenRepository.UpdateAsync(userToken);
-        //}
-        //public async Task<Response<LoginResponseDto>> RefreshTokenAsync(string refreshToken)
-        //{
-        //    var existingToken = await _userTokenRepository.GetByTokenAsync(refreshToken);
+                var existingUser = await _userRepository.GetByUsername(request.Username);
+                if (existingUser != null)
+                {
+                    _logger.LogWarning("Registration failed: Username {Username} already exists", request.Username);
+                    return Response<string>.Failure(HttpStatusCodes.BadRequest, "Username already exists");
+                }
 
-        //    if (existingToken == null || existingToken.IsRevoked || existingToken.IsExpired)
-        //    {
-        //        return Response<LoginResponseDto>.Failure(HttpStatusCode.NotAuthenticated, "Invalid or expired refresh token");
-        //    }
+                var newUser = _mapper.Map<User>(request);
 
-        //    var user = await _userRepository.GetByIdAsync(existingToken.UserId);
-        //    if (user == null || !user.IsActive)
-        //    {
-        //        return Response<LoginResponseDto>.Failure(HttpStatusCode.NotAuthenticated, "User not found or inactive");
-        //    }
+                newUser.SetPassword(_passwordHasher.HashPassword(newUser, request.Password));
 
-        //    // Generate new JWT token and refresh token
-        //    var newJwtToken = _jwtService.GenerateToken(user);
-        //    var newRefreshToken = GenerateRefreshToken();
+                newUser.Activate(); // this should be by email confirmation
+                newUser.SetRole(UserRole.User); // this default role untill Admin change it 
 
-        //    // Revoke old refresh token
-        //    existingToken.Revoke(revokedByIp: null, replacedByToken: newRefreshToken);
 
-        //    // Save new refresh token entity
-        //    var userToken = new UserToken(user.Id, newRefreshToken, DateTime.UtcNow.AddDays(30), createdByIp: null);
-        //    await _userTokenRepository.UpdateAsync(existingToken);
-        //    await _userTokenRepository.AddAsync(userToken);
+                await _userRepository.Add(newUser);
+                await _unitOfWork.SaveChangesAsync();
 
-        //    var response = new LoginResponseDto
-        //    {
-        //        Token = newJwtToken,
-        //        RefreshToken = newRefreshToken,
-        //        Username = user.Username
-        //    };
+                _logger.LogInformation("New user registered: {Username}", newUser.Username);
 
-        //    return Response<LoginResponseDto>.SuccessResult(response, "Token refreshed successfully");
-        //}
+                return Response<string>.SuccessResult("User registered successfully", HttpStatusCodes.OK);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred during registration for username {Username}", request.Username);
+                return Response<string>.Failure(HttpStatusCodes.InternalError, "An unexpected error occurred");
+            }
+        }
 
-        //#region Helper
-        //private string GenerateRefreshToken()
-        //{
-        //    var randomNumber = new byte[64];
-        //    using var rng = RandomNumberGenerator.Create();
-        //    rng.GetBytes(randomNumber);
-        //    return Convert.ToBase64String(randomNumber);
-        //}
-        //#endregion
+        public async Task<Response<LoginResponseDto>> RefreshTokenAsync(string refreshToken)
+        {
+            var storedToken = await _userTokenRepository.GetByTokenAsync(refreshToken);
+
+            if (storedToken == null || !storedToken.IsActive)
+            {
+                return Response<LoginResponseDto>.Failure(HttpStatusCodes.BadRequest, "Invalid or expired refresh token");
+            }
+
+            var user = storedToken.User;
+
+            var newJwtToken = _jwtService.GenerateToken(user);
+            var newRefreshTokenValue = GenerateSecureToken();
+
+            storedToken.Revoke(null, newRefreshTokenValue);
+            await _userTokenRepository.RevokeAsync(storedToken);
+
+            var newRefreshToken = new UserToken(user.Id, newRefreshTokenValue, DateTime.UtcNow.AddDays(7), null);
+            await _userTokenRepository.AddAsync(newRefreshToken);
+
+            await _unitOfWork.SaveChangesAsync();
+
+            var response = new LoginResponseDto
+            {
+                Token = newJwtToken,
+                RefreshToken = newRefreshTokenValue,
+                Username = user.Username,
+                Role = user.Role.ToString()
+            };
+
+            return Response<LoginResponseDto>.SuccessResult(response);
+        }
+
+ 
+        public async Task LogoutAsync(string refreshToken)
+        {
+            var storedToken = await _userTokenRepository.GetByTokenAsync(refreshToken);
+
+            if (storedToken == null || !storedToken.IsActive)
+            {
+                return;
+            }
+            await _userTokenRepository.RevokeAsync(storedToken, revokedByIp: null, replacedByToken: null);
+            await _unitOfWork.SaveChangesAsync();
+        }
+
+        public async Task LogoutAllSessionsAsync(Guid userId)
+        {
+            await _userTokenRepository.RevokeAllTokensAsync(userId);
+            await _unitOfWork.SaveChangesAsync();
+        }
+
+        #region Helper 
+        private string GenerateSecureToken()
+        {
+            var randomNumber = new byte[64];
+            using var rng = RandomNumberGenerator.Create();
+            rng.GetBytes(randomNumber);
+            return Convert.ToBase64String(randomNumber);
+        }
+        #endregion
     }
 }

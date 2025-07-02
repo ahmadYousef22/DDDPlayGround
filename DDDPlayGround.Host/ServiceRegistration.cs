@@ -1,19 +1,24 @@
 ﻿using AspNetCoreRateLimit;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.OpenApi.Models;
+using System.Threading.RateLimiting;
 
 namespace DDDPlayGround.Host
 {
     public static class ServiceRegistration
     {
-        public static IServiceCollection AddRateLimiting(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddRateLimiting(this IServiceCollection services)
         {
-            services.AddOptions();
-            services.AddMemoryCache();
-            services.Configure<IpRateLimitOptions>(configuration.GetSection("IpRateLimiting"));
-            services.AddSingleton<IIpPolicyStore, MemoryCacheIpPolicyStore>();
-            services.AddSingleton<IRateLimitCounterStore, MemoryCacheRateLimitCounterStore>();
-            services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
-
+            services.AddRateLimiter(options =>
+            {
+                options.AddFixedWindowLimiter("Fixed", limiterOptions =>
+                {
+                    limiterOptions.PermitLimit = 100;          // Max 100 requests
+                    limiterOptions.Window = TimeSpan.FromMinutes(1); // Per minute
+                    limiterOptions.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+                    limiterOptions.QueueLimit = 50;
+                });
+            });
             return services;
         }
         public static IServiceCollection AddCorsService(this IServiceCollection services)

@@ -25,5 +25,8 @@
   <ItemGroup>
     <ProjectReference Include="..\DDDPlayGround.Infrastructure\DDDPlayGround.Infrastructure.csproj" />
   </ItemGroup>
+	<PropertyGroup>
+		<UserSecretsId>dddplayground-1234-5678-9012</UserSecretsId>
+	</PropertyGroup>
 
 </Project>
