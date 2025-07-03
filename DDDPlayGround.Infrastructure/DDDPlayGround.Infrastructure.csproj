@@ -38,6 +38,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Persistence\Migrations\" />
     <Folder Include="Persistence\Scripts\" />
   </ItemGroup>
 
