@@ -1,5 +1,4 @@
 ﻿using DDDPlayGround.Domain.Constants;
-using DDDPlayGround.Domain.Entities.Authentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

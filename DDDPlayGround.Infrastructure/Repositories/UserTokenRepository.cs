@@ -1,5 +1,5 @@
-﻿using DDDPlayGround.Domain.Entities.Authentication;
-using DDDPlayGround.Domain.Interfaces;
+﻿using DDDPlayGround.Domain.Contracts;
+using DDDPlayGround.Domain.Entities.Authentication;
 using DDDPlayGround.Infrastructure.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 

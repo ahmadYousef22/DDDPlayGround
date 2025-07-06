@@ -1,5 +1,4 @@
-﻿
-namespace DDDPlayGround.Domain.Interfaces
+﻿namespace DDDPlayGround.Domain.Contracts
 {
     public interface IAggregateRoot { }
 }

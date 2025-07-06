@@ -1,7 +1,6 @@
-﻿
-namespace DDDPlayGround.Domain.Interfaces
+﻿namespace DDDPlayGround.Domain.Contracts
 {
-    public interface IRepository <TEntity, TKey> where TEntity : class, IAggregateRoot
+    public interface IRepository<TEntity, TKey> where TEntity : class, IAggregateRoot
     {
         Task<TEntity?> GetById(TKey id);
         Task<IEnumerable<TEntity>> GetAll();

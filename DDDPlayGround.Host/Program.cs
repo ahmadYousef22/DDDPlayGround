@@ -1,18 +1,13 @@
 using DDDPlayGround.Host;
 using DDDPlayGround.Infrastructure;
 using DDDPlayGround.Infrastructure.Configuration;
-using System.Text.Encodings.Web;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddConnectionString(builder.Configuration);
 
-builder.Services.AddControllers()
-    .AddJsonOptions(options =>
-     {
-         options.JsonSerializerOptions.Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping; 
-     });
+builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
 
@@ -49,16 +44,6 @@ builder.WebHost.ConfigureKestrel(serverOptions =>
 builder.Services.AddAntiforgery(options =>
 {
     options.HeaderName = "X-XSRF-TOKEN";
-});
-
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowAll", builder =>
-    {
-        builder.AllowAnyOrigin()
-               .AllowAnyMethod()
-               .AllowAnyHeader();
-    });
 });
 
 var app = builder.Build();

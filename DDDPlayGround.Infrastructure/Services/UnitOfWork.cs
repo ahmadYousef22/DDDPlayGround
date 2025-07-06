@@ -1,4 +1,4 @@
-﻿using DDDPlayGround.Domain.Interfaces;
+﻿using DDDPlayGround.Domain.Contracts;
 using DDDPlayGround.Infrastructure.Persistence.Context;
 using Microsoft.EntityFrameworkCore.Storage;
 

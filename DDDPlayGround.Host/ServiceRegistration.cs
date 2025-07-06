@@ -40,12 +40,11 @@ namespace DDDPlayGround.Host
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "DDDPlayGround API", Version = "v1" });
 
-                // Add Bearer security definition
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
-                    Description = @"JWT Authorization header using the Bearer scheme.  
-                        Enter 'Bearer' [space] and then your token in the text input below.  
-                        Example: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9'",
+                    Description = @"JWT Authorization using the Bearer scheme.  
+                            Enter 'Bearer' followed by your token.  
+                            Example: 'Bearer ey...'",
                     Name = "Authorization",
                     In = ParameterLocation.Header,
                     Type = SecuritySchemeType.Http,
@@ -53,24 +52,23 @@ namespace DDDPlayGround.Host
                     BearerFormat = "JWT"
                 });
 
-                // Add Bearer security requirement globally
-                c.AddSecurityRequirement(new OpenApiSecurityRequirement()
-    {
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
         {
-            new OpenApiSecurityScheme
             {
-                Reference = new OpenApiReference
+                new OpenApiSecurityScheme
                 {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
+                    Reference = new OpenApiReference
+                    {
+                        Type = ReferenceType.SecurityScheme,
+                        Id = "Bearer"
+                    },
+                    Scheme = "bearer",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header
                 },
-                Scheme = "oauth2",
-                Name = "Bearer",
-                In = ParameterLocation.Header
-            },
-            new List<string>()
-        }
-    });
+                new List<string>()
+            }
+        });
             });
 
             return services;

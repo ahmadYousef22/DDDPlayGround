@@ -1,4 +1,4 @@
-﻿using DDDPlayGround.Domain.Interfaces;
+﻿using DDDPlayGround.Domain.Contracts;
 using Microsoft.EntityFrameworkCore;
 
 namespace DDDPlayGround.Infrastructure.Repositories

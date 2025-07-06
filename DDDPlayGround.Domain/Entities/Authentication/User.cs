@@ -1,7 +1,7 @@
 ﻿using DDDPlayGround.Domain.Base;
+using DDDPlayGround.Domain.Contracts;
 using DDDPlayGround.Domain.Entities.Authentication;
 using DDDPlayGround.Domain.Enums;
-using DDDPlayGround.Domain.Interfaces;
 using DDDPlayGround.Domain.ValueObjects;
 
 public class User : AuditableEntity, IAggregateRoot

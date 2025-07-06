@@ -1,7 +1,6 @@
 ﻿using DDDPlayGround.Application.Authentication;
 using DDDPlayGround.Application.Authentication.JwtToken;
 using DDDPlayGround.Application.Integration;
-using DDDPlayGround.Domain.Interfaces;
 using DDDPlayGround.Infrastructure.Integration.Rest;
 using DDDPlayGround.Infrastructure.Integration.Soap;
 using DDDPlayGround.Infrastructure.Middlewares;
@@ -21,6 +20,7 @@ using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using Serilog.Sinks.MSSqlServer;
 using System.Text;
+using DDDPlayGround.Domain.Contracts;
 
 namespace DDDPlayGround.Infrastructure
 {

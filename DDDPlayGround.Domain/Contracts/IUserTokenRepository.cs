@@ -1,8 +1,8 @@
 ﻿using DDDPlayGround.Domain.Entities.Authentication;
 
-namespace DDDPlayGround.Domain.Interfaces
+namespace DDDPlayGround.Domain.Contracts
 {
-    public interface IUserTokenRepository 
+    public interface IUserTokenRepository
     {
         Task AddAsync(UserToken token);
         Task<UserToken?> GetByTokenAsync(string token);

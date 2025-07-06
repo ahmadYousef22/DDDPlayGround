@@ -1,8 +1,7 @@
-﻿
-namespace DDDPlayGround.Domain.Interfaces
+﻿namespace DDDPlayGround.Domain.Contracts
 {
     public interface IUserRepository : IRepository<User, Guid>
     {
-        Task<User?> GetByUsername(string username);  
+        Task<User?> GetByUsername(string username);
     }
 }

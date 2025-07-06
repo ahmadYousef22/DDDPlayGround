@@ -2,9 +2,9 @@
 using DDDPlayGround.Application.Authentication.Dtos;
 using DDDPlayGround.Application.Authentication.JwtToken;
 using DDDPlayGround.Domain.Base;
+using DDDPlayGround.Domain.Contracts;
 using DDDPlayGround.Domain.Entities.Authentication;
 using DDDPlayGround.Domain.Enums;
-using DDDPlayGround.Domain.Interfaces;
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
