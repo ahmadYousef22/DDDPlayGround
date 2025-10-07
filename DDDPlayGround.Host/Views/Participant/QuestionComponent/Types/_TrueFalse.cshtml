@@ -1,0 +1,9 @@
+@model DDDPlayGround.Host.Models.Survey.SurveyQuestionViewModel
+<div class="form-check">
+  <input class="form-check-input" type="radio" name="q_@Model.Id" id="q_@Model.Id_yes" value="true" />
+  <label class="form-check-label" for="q_@Model.Id_yes">Yes</label>
+  </div>
+<div class="form-check">
+  <input class="form-check-input" type="radio" name="q_@Model.Id" id="q_@Model.Id_no" value="false" />
+  <label class="form-check-label" for="q_@Model.Id_no">No</label>
+</div>

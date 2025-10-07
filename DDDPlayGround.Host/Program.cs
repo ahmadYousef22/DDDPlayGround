@@ -8,7 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddConnectionString(builder.Configuration);
 
-builder.Services.AddControllers()
+builder.Services.AddControllersWithViews()
     .AddJsonOptions(options =>
      {
          options.JsonSerializerOptions.Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping; 
@@ -67,7 +67,6 @@ app.UseCustomSerilogRequestLogging();
 
 app.UseSwagger();
 
-app.UseCors("AllowAll");
 
 app.UseSwaggerUI(c =>
 {
@@ -75,6 +74,12 @@ app.UseSwaggerUI(c =>
 });
 
 app.UseHttpsRedirection();
+
+app.UseStaticFiles();
+
+app.UseRouting();
+
+app.UseCors("AllowAll");
 
 //if (builder.Environment.IsProduction()) { app.UseHsts(); } // this allow only https request 
 
@@ -89,5 +94,9 @@ app.UseRateLimiter();
 app.UseRequestLogging();
 
 app.MapControllers();
+
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Participant}/{action=Index}/{id?}");
 
 app.Run();

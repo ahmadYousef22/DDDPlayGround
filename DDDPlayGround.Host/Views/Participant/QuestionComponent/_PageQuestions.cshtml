@@ -1,0 +1,28 @@
+@model DDDPlayGround.Host.Models.Survey.SurveyPageViewModel
+<div class="page-block mb-4">
+    <div class="mb-3">
+        <h5 class="mb-0">Page @Model.PageNumber</h5>
+    </div>
+
+    <div>
+        @foreach (var q in Model.Questions)
+        {
+            <div class="question mb-3">
+                <div class="question-header d-flex align-items-start mb-2">
+                    <span class="fw-semibold me-2">@q.QuestionTextEn</span>
+                    @if (q.IsMandatory) { <span class="mandatory text-danger">*</span> }
+                </div>
+                <div class="question-body">
+                    @if (q.QuestionTypeId == 1)
+                    {
+                        @Html.Partial("QuestionComponent/Types/_TrueFalse", q)
+                    }
+                    else
+                    {
+                        @Html.Partial("QuestionComponent/Types/_Default", q)
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</div>

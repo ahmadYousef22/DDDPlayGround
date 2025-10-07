@@ -1,0 +1,12 @@
+@model dynamic
+<div class="question mb-3">
+    <div class="question-header d-flex align-items-start mb-2">
+        <span class="fw-semibold me-2">@Model?.questionTextEn</span>
+        @if ((bool?)(Model?.isMandatory) == true)
+        {
+            <span class="mandatory text-danger">*</span>
+        }
+    </div>
+    <div class="question-body">
+    </div>
+</div>
