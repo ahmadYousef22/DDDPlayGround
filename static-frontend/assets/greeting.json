@@ -1,0 +1,4 @@
+{
+  "message": "Hello! Your static frontend is running.",
+  "timestamp": "{{will_be_fetched_at_runtime}}"
+}
