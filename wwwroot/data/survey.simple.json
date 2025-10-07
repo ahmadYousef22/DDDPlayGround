@@ -1,0 +1,23 @@
+{
+  "title": "Simple Survey",
+  "pages": [
+    {
+      "id": "00000000-0000-0000-0000-000000000001",
+      "title": "Basics",
+      "questions": [
+        {
+          "id": "10000000-0000-0000-0000-000000000001",
+          "questionTypeId": 1,
+          "title": "Do you agree?",
+          "isRequired": true
+        },
+        {
+          "id": "10000000-0000-0000-0000-000000000002",
+          "questionTypeId": 2,
+          "title": "Your name",
+          "placeholder": "Type your name"
+        }
+      ]
+    }
+  ]
+}
