@@ -1,0 +1,12 @@
+@model dynamic
+@{
+    var q = Model;
+}
+<div class="form-check">
+  <input class="form-check-input" type="radio" name="q_@q?.id" id="q_@q?.id_yes" value="true">
+  <label class="form-check-label" for="q_@q?.id_yes">Yes</label>
+</div>
+<div class="form-check">
+  <input class="form-check-input" type="radio" name="q_@q?.id" id="q_@q?.id_no" value="false">
+  <label class="form-check-label" for="q_@q?.id_no">No</label>
+</div>

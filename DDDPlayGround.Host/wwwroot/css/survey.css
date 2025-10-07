@@ -1,0 +1,9 @@
+/* SAIB Survey Portal - base styles */
+.page-block { background: #fff; border: 1px solid #e5e7eb; border-radius: .5rem; padding: 1rem; }
+.question { padding: .75rem 0; border-bottom: 1px dashed #e5e7eb; }
+.question:last-child { border-bottom: none; }
+.question-header { font-weight: 600; }
+.mandatory { color: #dc3545; margin-left: .25rem; }
+.question-body { margin-top: .5rem; }
+/* Spacing helpers */
+.form-check + .form-check { margin-top: .25rem; }

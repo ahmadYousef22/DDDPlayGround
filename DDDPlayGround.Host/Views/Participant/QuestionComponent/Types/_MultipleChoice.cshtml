@@ -1,0 +1,16 @@
+@model dynamic
+@{
+    var q = Model;
+}
+<div>
+  @if (q?.choices != null)
+  {
+      foreach (var c in q.choices)
+      {
+          <div class="form-check">
+              <input class="form-check-input" type="radio" name="q_@q.id" id="q_@q.id_@c.id" value="@c.id">
+              <label class="form-check-label" for="q_@q.id_@c.id">@c.text</label>
+          </div>
+      }
+  }
+</div>

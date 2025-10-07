@@ -1,0 +1,14 @@
+@model dynamic
+@{
+    var page = Model;
+}
+<div class="page-block mb-4">
+    <div class="mb-3">
+        <h5 class="mb-0">Page @page?.pageNumber</h5>
+    </div>
+
+    <div>
+        @* Each question type will be rendered on the client via Vue. This Razor partial is kept minimal. *@
+        <div id="page-@page?.pageNumber"></div>
+    </div>
+</div>
