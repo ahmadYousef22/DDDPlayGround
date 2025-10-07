@@ -1,0 +1,40 @@
+{
+  "title": "Advanced Survey",
+  "pages": [
+    {
+      "id": "00000000-0000-0000-0000-000000000010",
+      "title": "Preferences",
+      "questions": [
+        {
+          "id": "20000000-0000-0000-0000-000000000001",
+          "questionTypeId": 3,
+          "title": "Favorite fruits",
+          "allowMultiple": true,
+          "options": [
+            { "value": "apple", "label": "Apple" },
+            { "value": "banana", "label": "Banana" },
+            { "value": "cherry", "label": "Cherry" }
+          ]
+        },
+        {
+          "id": "20000000-0000-0000-0000-000000000002",
+          "questionTypeId": 1,
+          "title": "Subscribe to newsletter?",
+          "isRequired": false
+        }
+      ]
+    },
+    {
+      "id": "00000000-0000-0000-0000-000000000011",
+      "title": "About you",
+      "questions": [
+        {
+          "id": "20000000-0000-0000-0000-000000000003",
+          "questionTypeId": 2,
+          "title": "Short bio",
+          "placeholder": "Tell us something..."
+        }
+      ]
+    }
+  ]
+}
